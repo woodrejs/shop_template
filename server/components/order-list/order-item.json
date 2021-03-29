@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_order_list_order_items",
+  "info": {
+    "name": "orderList",
+    "icon": "align-justify",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "quantity": {
+      "type": "integer"
+    }
+  }
+}

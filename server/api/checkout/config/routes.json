@@ -1,0 +1,10 @@
+{
+    "routes": [   
+      {
+        "method": "POST",
+        "path": "/create-checkout-session",
+        "handler": "checkout.post"
+       
+      }
+    ]
+  }
