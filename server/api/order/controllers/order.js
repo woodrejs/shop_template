@@ -1,7 +1,5 @@
 "use strict";
 const { sanitizeEntity } = require("strapi-utils");
-const axios = require("axios");
-const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 module.exports = {
   async create({ request, response, query }) {

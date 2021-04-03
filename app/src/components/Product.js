@@ -4,17 +4,24 @@ import { useCounter } from "../utils/Sweet_state";
 import { addToCart } from "../utils/Cart";
 
 const Product = ({ product }) => {
-  const { name, unit_amount, description, id, images } = product;
-  const [__, { setCart }] = useCounter();
+  const { name, unit_amount, images } = product;
+  const [, { setCart }] = useCounter();
 
   //*add selected product to cart and sweet state
   const handleAddToCart = (e) => addToCart(e, product, setCart);
 
   return (
     <div>
+      {images.length && (
+        <img
+          src={images[0].url}
+          alt="product_thumb"
+          style={{ height: "15vw" }}
+        />
+      )}
       <div>{name}</div>
       <div>{unit_amount}</div>
-      <div>{description}</div>
+
       <button onClick={(e) => handleAddToCart(e)}>Add Product</button>
     </div>
   );

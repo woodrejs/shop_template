@@ -23,7 +23,7 @@
     "building": {
       "type": "string"
     },
-    "flat": {
+    "apartment": {
       "type": "string"
     },
     "post_code": {

@@ -1,17 +1,33 @@
 import { createStore, createHook } from "react-sweet-state";
+import { setStorage, getStorage } from "./Storage";
 
 const Store = createStore({
   // value of the store on initialisation
   initialState: {
     products: [],
-
-    adress_store:
-      JSON.parse(
-        sessionStorage.getItem(process.env.REACT_APP_SESSION_STORAGE_NAME)
-      ) || [],
-    cart: JSON.parse(
-      localStorage.getItem(process.env.REACT_APP_LOCAL_STORAGE_NAME)
-    ),
+    cart: getStorage(process.env.REACT_APP_LOCAL_STORAGE_NAME, true) || [],
+    adress: getStorage(process.env.REACT_APP_SESSION_STORAGE_NAME, false) || {
+      name: "",
+      surname: "",
+      street: "",
+      building: "",
+      apartment: "",
+      post_code: "",
+      city: "",
+      phone: "",
+      email: "",
+    },
+    adressValidation: {
+      name: true,
+      surname: true,
+      street: true,
+      building: true,
+      apartment: true,
+      post_code: true,
+      city: true,
+      phone: true,
+      email: true,
+    },
   },
   // actions that trigger store mutation
   actions: {
@@ -24,10 +40,20 @@ const Store = createStore({
       setState({
         cart: val,
       });
+      //set value in localstorage
+      setStorage(process.env.REACT_APP_LOCAL_STORAGE_NAME, val, true);
     },
-    setAdress_store: (value) => ({ setState, getState }) => {
+    setAdress: (value) => ({ setState, getState }) => {
       setState({
-        adress_store: value,
+        adress: value,
+      });
+
+      //set value in sessionstorage
+      setStorage(process.env.REACT_APP_SESSION_STORAGE_NAME, value, false);
+    },
+    setAdressValidation: (value) => ({ setState, getState }) => {
+      setState({
+        adressValidation: value,
       });
     },
   },

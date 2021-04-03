@@ -1,18 +1,14 @@
-function isInArr(data, id) {
-  return data ? data.findIndex((item) => item.id === id) : -1;
-}
+import { getStorage, setStorage } from "./Storage";
 
 export function addToCart(e, item, clb) {
   e.preventDefault();
 
-  let itemsArr = [];
   const { id, unit_amount } = item;
-  const storage_name = process.env.REACT_APP_LOCAL_STORAGE_NAME;
-  const local_storage = localStorage.getItem(storage_name);
+  const data = getStorage(process.env.REACT_APP_LOCAL_STORAGE_NAME, true);
+  let itemsArr = [];
 
-  if (local_storage) {
+  if (data) {
     // check if product is already in storage
-    const data = JSON.parse(local_storage);
     let index = isInArr(data, id);
 
     if (index === -1) {
@@ -25,19 +21,14 @@ export function addToCart(e, item, clb) {
     itemsArr = [{ id, quantity: 1, unit_amount }];
   }
 
-  //set in storage
-  localStorage.setItem(storage_name, JSON.stringify(itemsArr));
   //set in store
   clb(itemsArr);
 }
 export function removeFromCart(e, id, clb) {
   e.preventDefault();
+  const data = getStorage(process.env.REACT_APP_LOCAL_STORAGE_NAME, true);
 
-  const storage_name = process.env.REACT_APP_LOCAL_STORAGE_NAME;
-  const items = localStorage.getItem(storage_name);
-
-  if (items) {
-    const data = JSON.parse(items);
+  if (data) {
     let itemsArr = [...data];
 
     // check if item is in storage
@@ -50,20 +41,15 @@ export function removeFromCart(e, id, clb) {
       itemsArr = data.filter((item) => item.id !== id);
     }
 
-    //set cart items in storage
-    localStorage.setItem(storage_name, JSON.stringify(itemsArr));
     //set in store
     clb(itemsArr);
   }
 }
 export function removeItemFromCart(e, id, clb) {
   e.preventDefault();
+  const data = getStorage(process.env.REACT_APP_LOCAL_STORAGE_NAME, true);
 
-  const storage_name = process.env.REACT_APP_LOCAL_STORAGE_NAME;
-  const items = localStorage.getItem(storage_name);
-
-  if (items) {
-    const data = JSON.parse(items);
+  if (data) {
     let itemsArr = [...data];
 
     // check if item is in storage
@@ -73,19 +59,9 @@ export function removeItemFromCart(e, id, clb) {
       itemsArr = data.filter((item) => item.id !== id);
     }
 
-    //set cart items in storage
-    localStorage.setItem(storage_name, JSON.stringify(itemsArr));
     //set in store
     clb(itemsArr);
   }
-}
-export function clearCart(e, clb) {
-  e.preventDefault();
-  const storage_name = process.env.REACT_APP_LOCAL_STORAGE_NAME;
-  //remove from storage
-  localStorage.removeItem(storage_name);
-  //remove from store
-  clb();
 }
 export function getProductsInCart(cart, products) {
   let productsInCart = {};
@@ -106,4 +82,7 @@ export function getProductsInCart(cart, products) {
   }
 
   return productsToDisplay;
+}
+function isInArr(data, id) {
+  return data ? data.findIndex((item) => item.id === id) : -1;
 }

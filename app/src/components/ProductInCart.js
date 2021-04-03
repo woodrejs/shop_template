@@ -4,9 +4,10 @@ import { useCounter } from "../utils/Sweet_state";
 import { addToCart, removeFromCart, removeItemFromCart } from "../utils/Cart";
 
 const ProductInCart = ({ product, quantity }) => {
-  const { name, unit_amount, description, id, images } = product;
+  const { name, unit_amount, _id, images } = product;
   const [productQnty, setProductQnty] = useState(quantity);
-  const [__, { setCart }] = useCounter();
+  //sweet_state
+  const [, { setCart }] = useCounter();
 
   const handleNumberInput = (e) => {
     e.preventDefault();
@@ -15,14 +16,20 @@ const ProductInCart = ({ product, quantity }) => {
     if (val >= 1) {
       val > quantity
         ? addToCart(e, product, setCart)
-        : removeFromCart(e, product.id, setCart);
+        : removeFromCart(e, _id, setCart);
       setProductQnty(val);
     }
   };
-  const handleRemoveFromCart = (e) => removeItemFromCart(e, id, setCart);
 
   return (
     <div>
+      {images.length && (
+        <img
+          src={images[0].url}
+          alt="product_thumb"
+          style={{ height: "5vw" }}
+        />
+      )}
       <div>{name}</div>
       <div>{unit_amount}</div>
       <input
@@ -30,7 +37,7 @@ const ProductInCart = ({ product, quantity }) => {
         onChange={(e) => handleNumberInput(e)}
         value={productQnty}
       />
-      <button onClick={(e) => handleRemoveFromCart(e)}>
+      <button onClick={(e) => removeItemFromCart(e, _id, setCart)}>
         Remove product from Cart
       </button>
     </div>

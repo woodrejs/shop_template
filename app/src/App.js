@@ -11,7 +11,7 @@ import axios from "axios";
 require("dotenv").config();
 
 const App = () => {
-  //*get and set products in sweet state
+  //sweet state
   const [{ products }, { setProducts }] = useCounter();
 
   useEffect(async () => {

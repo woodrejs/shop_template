@@ -1,35 +1,101 @@
 import React from "react";
 //COMPONENTS
 import ProductInCart from "../components/ProductInCart";
-import AdressForm from "../components/AdressForm";
+import CustomInput from "../components/CustomInput";
 //UTILES
 import { useCounter } from "../utils/Sweet_state";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { loadStripe } from "@stripe/stripe-js";
-import { clearCart, getProductsInCart } from "../utils/Cart";
+import { getProductsInCart } from "../utils/Cart";
+//DATA
+const INPUTS = [
+  {
+    name: "name",
+    selector: "name",
+    id: uuidv4(),
+  },
+  {
+    name: "surname",
+    selector: "surname",
+    id: uuidv4(),
+  },
+  {
+    name: "street",
+    selector: "street",
+    id: uuidv4(),
+  },
+  {
+    name: "building",
+    selector: "building",
+    id: uuidv4(),
+  },
+  {
+    name: "apartment",
+    selector: "apartment",
+    id: uuidv4(),
+  },
+  {
+    name: "city",
+    selector: "city",
+    id: uuidv4(),
+  },
+  {
+    name: "post code",
+    selector: "post_code",
+    id: uuidv4(),
+  },
+  {
+    name: "phone",
+    selector: "phone",
+    id: uuidv4(),
+  },
+  {
+    name: "email",
+    selector: "email",
+    id: uuidv4(),
+  },
+];
 
 const Cart = () => {
-  const [{ cart, products, adress_store }, { setCart }] = useCounter();
+  const [
+    { cart, products, adress, adressValidation },
+    { setCart, setAdressValidation },
+  ] = useCounter();
 
-  const handleClearCart = (e) => clearCart(e, setCart);
-  const handleDisplayTotalPrice = () => displayTotalPrice(cart);
-  const handleCheckout = (e) => goToCheckout(e, adress_store);
-  const handleDisplayProductsInCart = () =>
-    displayProductsInCart(cart, products);
+  //display fn
+  const displayProductsInCart = () =>
+    cart &&
+    getProductsInCart(cart, products).map(({ item, quantity }) => (
+      <ProductInCart key={uuidv4()} product={item} quantity={quantity} />
+    ));
+  const displayInputs = () =>
+    INPUTS.map((data) => (
+      <CustomInput
+        key={data.id}
+        data={data}
+        isValid={adressValidation[data.selector]}
+      />
+    ));
+  //handlers
+  const handleClearCart = () => setCart(null);
+  const handleCheckout = (e) =>
+    showTotalPrice(cart) > 2 &&
+    addressIsValid(adress, setAdressValidation) &&
+    goToStripeCheckout(e);
 
   return (
     <div>
-      {handleDisplayProductsInCart()}
+      {displayProductsInCart()}
       <hr />
-      <button onClick={(e) => handleClearCart(e)}>clear cart</button>
+      <button onClick={handleClearCart}>clear cart</button>
       <button onClick={(e) => handleCheckout(e)}>Checkout</button>
       <br />
       <div>
-        Total <span>{handleDisplayTotalPrice()} PLN</span>
+        Total <span>{showTotalPrice(cart)} PLN</span>
       </div>
       <hr />
-      <AdressForm />
+      <form>{displayInputs()}</form>
     </div>
   );
 };
@@ -37,84 +103,80 @@ const Cart = () => {
 export default Cart;
 
 //FUNCTIONS
-function displayProductsInCart(cart, products) {
-  if (cart && products) {
-    const productsToDisplay = getProductsInCart(cart, products);
+async function goToStripeCheckout(e) {
+  e.preventDefault();
 
-    return productsToDisplay.map(({ item, quantity }) => (
-      <ProductInCart key={uuidv4()} product={item} quantity={quantity} />
-    ));
-  } else return null;
+  const stripe = await loadStripe(process.env.REACT_APP_STRIPE_PUBLIC);
+  const items = localStorage.getItem(process.env.REACT_APP_LOCAL_STORAGE_NAME);
+  const path = `${process.env.REACT_APP_DB_HOST}/create-checkout-session`;
+
+  //get sessionId
+  const {
+    data: { id: sessionId },
+  } = await axios.post(path, { items });
+
+  // When the customer clicks on the button, redirect them to Checkout.
+  const result = await stripe.redirectToCheckout({
+    sessionId,
+  });
+
+  // if error from redirectToCheckout
+  if (result.error) {
+    console.error(result.error);
+  }
 }
-function displayTotalPrice(cart) {
+function showTotalPrice(arr) {
   let total = 0;
-  if (cart) {
-    cart.forEach(({ quantity, unit_amount }) => {
+  if (arr) {
+    arr.forEach(({ quantity, unit_amount }) => {
       total += unit_amount * quantity;
     });
   }
   return total / 100;
 }
-async function goToCheckout(e, adress_store) {
-  e.preventDefault();
+function addressIsValid(data, clb) {
+  //validation
+  const validationObj = {
+    name: isValid(
+      `^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð -]{3,30}$`,
+      data.name
+    ),
+    surname: isValid(
+      `^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð -]{3,30}$`,
+      data.surname
+    ),
+    street: isValid(
+      `[#.0-9a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð,-]{3,30}`,
+      data.street
+    ),
+    building: isValid(
+      `^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð0-9]{1,10}$`,
+      data.building
+    ),
+    apartment: isValid(
+      `^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð0-9]{1,10}$`,
+      data.apartment
+    ),
+    post_code: isValid(`^[0-9]{2}[- ]{0,1}[0-9]{3}$`, data.post_code),
+    city: isValid(
+      `^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð -]{3,25}$`,
+      data.city
+    ),
+    phone: isValid(`^[0-9]{9}$`, data.phone),
+    email: isValid(
+      "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$",
+      data.email
+    ),
+  };
 
-  if (adressValidation(adress_store)) {
-    const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC);
-    const stripe = await stripePromise;
+  //set in sweet_state
+  clb(validationObj);
 
-    const storage_name = process.env.REACT_APP_LOCAL_STORAGE_NAME;
-    const local_storage = localStorage.getItem(storage_name);
-
-    const {
-      data,
-    } = await axios.post(
-      `${process.env.REACT_APP_DB_HOST}/create-checkout-session`,
-      { items: local_storage }
-    );
-
-    // When the customer clicks on the button, redirect them to Checkout.
-    const result = await stripe.redirectToCheckout({
-      sessionId: data.id,
-    });
-
-    if (result.error) {
-      // If `redirectToCheckout` fails due to a browser or network
-      // error, display the localized error message to your customer
-      // using `result.error.message`.
-    }
-  }
+  //return validation result
+  const validationArr = Object.values(validationObj);
+  const validationResult = validationArr.findIndex((item) => !item);
+  return validationResult !== -1 ? false : true;
 }
-function adressValidation(adress_store) {
-  const {
-    name,
-    surname,
-    building,
-    flat,
-    street,
-    post_code,
-    email,
-    phone,
-  } = adress_store;
-
-  const nameValid = /^[a-zA-Z\s]{2,}$/.test(name.trim());
-  const surnameValid = /^[a-zA-Z\-]{2,}$/.test(surname.trim());
-  const buldingValid = /[a-zA-Z0-9]{1,10}/.test(building.trim());
-  const flatValid = flat.length < 10;
-  const streetValid = /^[#.0-9a-zA-Z\s,-]+$/.test(street.trim());
-  const post_codeValid = /^\d{2}[- ]{0,1}\d{3}$/.test(post_code.trim());
-  const phoneValid = /[0-9]{9}/.test(phone.trim());
-  const emailValid = /^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$/.test(
-    email.trim()
-  );
-
-  return (
-    nameValid &&
-    surnameValid &&
-    buldingValid &&
-    flatValid &&
-    streetValid &&
-    post_codeValid &&
-    emailValid &&
-    phoneValid
-  );
+function isValid(pattern, obj) {
+  return new RegExp(pattern).test(obj.trim());
 }

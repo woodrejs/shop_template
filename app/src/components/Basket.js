@@ -4,12 +4,12 @@ import { useCounter } from "../utils/Sweet_state";
 import { Link } from "react-router-dom";
 
 const Basket = () => {
-  const [{ cart }, __] = useCounter();
+  const [{ cart }] = useCounter();
 
   return (
     <Link to="/cart">
-      <span>Cart </span>
-      <span>{cart ? cart.length : 0}</span>
+      <span children="Cart: " />
+      <span children={cart.length} />
     </Link>
   );
 };

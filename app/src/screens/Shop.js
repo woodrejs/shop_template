@@ -6,15 +6,16 @@ import Basket from "../components/Basket";
 import { useCounter } from "../utils/Sweet_state";
 
 const Shop = () => {
-  const [{ products }, __] = useCounter();
+  const [{ products }] = useCounter();
+
+  const displayProducts = () =>
+    products.map((product) => <Product key={product._id} product={product} />);
 
   return (
     <div>
       <Basket />
       <hr />
-      {products.map((product) => (
-        <Product key={product.id} product={product} />
-      ))}
+      {displayProducts()}
     </div>
   );
 };
