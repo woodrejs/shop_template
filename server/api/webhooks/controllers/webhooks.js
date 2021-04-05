@@ -1,5 +1,7 @@
 "use strict";
 
+//need to set  webhood in stripe dashboard
+
 module.exports = {
   post: async ({ request, response }) => {
     const event = request.body;

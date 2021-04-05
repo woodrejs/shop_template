@@ -10,36 +10,35 @@ const ProductInCart = ({ product, quantity }) => {
   const [, { setCart }] = useCounter();
 
   const handleNumberInput = (e) => {
-    e.preventDefault();
     const val = e.target.value;
 
     if (val >= 1) {
       val > quantity
-        ? addToCart(e, product, setCart)
-        : removeFromCart(e, _id, setCart);
+        ? addToCart(product, setCart)
+        : removeFromCart(_id, setCart);
       setProductQnty(val);
     }
   };
 
   return (
-    <div>
+    <div class="productincart">
       {images.length && (
-        <img
-          src={images[0].url}
-          alt="product_thumb"
-          style={{ height: "5vw" }}
-        />
+        <img src={images[0].url} class="image-2" alt="product_thumb" />
       )}
-      <div>{name}</div>
-      <div>{unit_amount}</div>
-      <input
-        type="number"
-        onChange={(e) => handleNumberInput(e)}
-        value={productQnty}
-      />
-      <button onClick={(e) => removeItemFromCart(e, _id, setCart)}>
-        Remove product from Cart
-      </button>
+      <div class="productincart--content">
+        <h4 class="productincart__title">{name}</h4>
+        <h4 class="productincart__price">{unit_amount} PLN</h4>
+        <input
+          type="number"
+          onChange={(e) => handleNumberInput(e)}
+          value={productQnty}
+        />
+        <button
+          class="button w-button"
+          onClick={() => removeItemFromCart(_id, setCart)}
+          children="Remove from Cart"
+        />
+      </div>
     </div>
   );
 };

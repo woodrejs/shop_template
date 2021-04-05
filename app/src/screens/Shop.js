@@ -12,10 +12,18 @@ const Shop = () => {
     products.map((product) => <Product key={product._id} product={product} />);
 
   return (
-    <div>
-      <Basket />
-      <hr />
-      {displayProducts()}
+    <div class="mysection">
+      <div class="mycontainer">
+        <div class="menu">
+          <div class="menu__cart">
+            <Basket />
+          </div>
+        </div>
+        <div class="title_box">
+          <h1 class="title">Shop</h1>
+        </div>
+        <div class="w-layout-grid grid">{displayProducts()}</div>
+      </div>
     </div>
   );
 };

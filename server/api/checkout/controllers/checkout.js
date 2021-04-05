@@ -4,14 +4,7 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 module.exports = {
   post: async ({ request, response }) => {
-    const line_items = await getProducts(JSON.parse(request.body.items));
-    const address = request.body.address;
-    const orderList = JSON.stringify(
-      line_items.map((item) => ({
-        quantity: item.quantity,
-        name: item.price_data.product_data.name,
-      }))
-    );
+    const line_items = await getLineItems(request.body.items);
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card", "p24"],
@@ -20,8 +13,13 @@ module.exports = {
       success_url: `${process.env.WEB_HOST}/success?success=true`,
       cancel_url: `${process.env.WEB_HOST}/failed?canceled=true`,
       metadata: {
-        address,
-        orderList,
+        address: JSON.stringify(request.body.address),
+        orderList: JSON.stringify(
+          line_items.map((item) => ({
+            quantity: item.quantity,
+            name: item.price_data.product_data.name,
+          }))
+        ),
       },
     });
 
@@ -29,7 +27,7 @@ module.exports = {
   },
 };
 
-async function getProducts(items) {
+async function getLineItems(items) {
   const line_items = [];
 
   const data = await strapi.services.product.find();

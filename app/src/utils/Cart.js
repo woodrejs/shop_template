@@ -1,8 +1,6 @@
-import { getStorage, setStorage } from "./Storage";
+import { getStorage } from "./Storage";
 
-export function addToCart(e, item, clb) {
-  e.preventDefault();
-
+export function addToCart(item, clb) {
   const { id, unit_amount } = item;
   const data = getStorage(process.env.REACT_APP_LOCAL_STORAGE_NAME, true);
   let itemsArr = [];
@@ -24,8 +22,7 @@ export function addToCart(e, item, clb) {
   //set in store
   clb(itemsArr);
 }
-export function removeFromCart(e, id, clb) {
-  e.preventDefault();
+export function removeFromCart(id, clb) {
   const data = getStorage(process.env.REACT_APP_LOCAL_STORAGE_NAME, true);
 
   if (data) {
@@ -45,8 +42,7 @@ export function removeFromCart(e, id, clb) {
     clb(itemsArr);
   }
 }
-export function removeItemFromCart(e, id, clb) {
-  e.preventDefault();
+export function removeItemFromCart(id, clb) {
   const data = getStorage(process.env.REACT_APP_LOCAL_STORAGE_NAME, true);
 
   if (data) {

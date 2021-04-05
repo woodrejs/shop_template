@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 import { loadStripe } from "@stripe/stripe-js";
 import { getProductsInCart } from "../utils/Cart";
 import { getStorage } from "../utils/Storage";
+import { Link } from "react-router-dom";
 //DATA
 const INPUTS = [
   {
@@ -79,24 +80,57 @@ const Cart = () => {
       />
     ));
   //handlers
-  const handleClearCart = () => setCart(null);
-  const handleCheckout = () =>
+  const handleClearCart = () => setCart([]);
+  const handleCheckout = (e) => {
+    e.preventDefault();
+
     showTotalPrice(cart) > 2 &&
-    addressIsValid(adress, setAdressValidation) &&
-    goToStripeCheckout();
+      addressIsValid(adress, setAdressValidation) &&
+      goToStripeCheckout();
+  };
 
   return (
-    <div>
-      {displayProductsInCart()}
-      <hr />
-      <button onClick={handleClearCart}>clear cart</button>
-      <button onClick={handleCheckout}>Checkout</button>
-      <br />
-      <div>
-        Total <span>{showTotalPrice(cart)} PLN</span>
+    <div class="mysection">
+      <div class="mycontainer">
+        <div class="menu manu--cart">
+          <div class="menu__cart">
+            <Link to="/shop" class="heading-2">
+              go back
+            </Link>
+          </div>
+        </div>
+        <div class="title_box">
+          <h1 class="title">cart</h1>
+        </div>
+        <div class="w-row">
+          <div class="w-col w-col-6">
+            <div class="w-form">
+              <form id="email-form">
+                {displayInputs()}
+                <button
+                  type="submit"
+                  class="w-button"
+                  children="Checkout"
+                  onClick={(e) => handleCheckout(e)}
+                />
+              </form>
+            </div>
+          </div>
+          <div class="w-col w-col-6">
+            <div class="w-layout-grid grid-2">{displayProductsInCart()}</div>
+            <div class="cart__panel">
+              <h3 class="cart__panel__total_price">
+                total price: <span>{showTotalPrice(cart)}</span> pLN
+              </h3>
+              <button
+                onClick={handleClearCart}
+                class="cart__panel__btn w-button"
+                children="clear cart"
+              />
+            </div>
+          </div>
+        </div>
       </div>
-      <hr />
-      <form>{displayInputs()}</form>
     </div>
   );
 };

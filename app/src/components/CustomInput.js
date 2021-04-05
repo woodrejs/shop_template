@@ -19,6 +19,7 @@ const CustomInput = ({ data, isValid }) => {
       <input
         id={selector}
         type="text"
+        class="w-input"
         onChange={(e) => handleChange(e)}
         value={adress[selector]}
       />

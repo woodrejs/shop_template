@@ -1,5 +1,9 @@
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+//STYLE
+import "./styles/normalize.css";
+import "./styles/shop-template-f4799e.webflow.css";
+import "./styles/webflow.css";
 //SCREENS
 import Cart from "./screens/Cart";
 import Failed from "./screens/Failed";
