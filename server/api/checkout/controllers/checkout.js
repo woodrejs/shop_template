@@ -1,20 +1,28 @@
 "use strict";
 
-const axios = require("axios");
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 module.exports = {
   post: async ({ request, response }) => {
-    console.log(request.body.items);
     const line_items = await getProducts(JSON.parse(request.body.items));
-    const jwt = await userAuth();
+    const address = request.body.address;
+    const orderList = JSON.stringify(
+      line_items.map((item) => ({
+        quantity: item.quantity,
+        name: item.price_data.product_data.name,
+      }))
+    );
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card", "p24"],
       line_items,
       mode: "payment",
-      success_url: `${process.env.WEB_HOST}/success?success=true&jwt=${jwt}&session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.WEB_HOST}/success?success=true`,
       cancel_url: `${process.env.WEB_HOST}/failed?canceled=true`,
+      metadata: {
+        address,
+        orderList,
+      },
     });
 
     response.send({ id: session.id });
@@ -65,13 +73,6 @@ function getProductsInCart(cart, products) {
   }
 
   return productsToDisplay;
-}
-async function userAuth() {
-  const { data } = await axios.post(`${process.env.DB_HOST}/auth/local`, {
-    identifier: "test@test.pl",
-    password: "Maciek123",
-  });
-  return data.jwt;
 }
 function formatImages(arr) {
   if (arr) {

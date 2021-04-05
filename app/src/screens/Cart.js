@@ -3,11 +3,12 @@ import React from "react";
 import ProductInCart from "../components/ProductInCart";
 import CustomInput from "../components/CustomInput";
 //UTILES
+import axios from "axios";
 import { useCounter } from "../utils/Sweet_state";
 import { v4 as uuidv4 } from "uuid";
-import axios from "axios";
 import { loadStripe } from "@stripe/stripe-js";
 import { getProductsInCart } from "../utils/Cart";
+import { getStorage } from "../utils/Storage";
 //DATA
 const INPUTS = [
   {
@@ -79,17 +80,17 @@ const Cart = () => {
     ));
   //handlers
   const handleClearCart = () => setCart(null);
-  const handleCheckout = (e) =>
+  const handleCheckout = () =>
     showTotalPrice(cart) > 2 &&
     addressIsValid(adress, setAdressValidation) &&
-    goToStripeCheckout(e);
+    goToStripeCheckout();
 
   return (
     <div>
       {displayProductsInCart()}
       <hr />
       <button onClick={handleClearCart}>clear cart</button>
-      <button onClick={(e) => handleCheckout(e)}>Checkout</button>
+      <button onClick={handleCheckout}>Checkout</button>
       <br />
       <div>
         Total <span>{showTotalPrice(cart)} PLN</span>
@@ -103,17 +104,16 @@ const Cart = () => {
 export default Cart;
 
 //FUNCTIONS
-async function goToStripeCheckout(e) {
-  e.preventDefault();
-
+async function goToStripeCheckout() {
   const stripe = await loadStripe(process.env.REACT_APP_STRIPE_PUBLIC);
-  const items = localStorage.getItem(process.env.REACT_APP_LOCAL_STORAGE_NAME);
   const path = `${process.env.REACT_APP_DB_HOST}/create-checkout-session`;
+  const items = getStorage(process.env.REACT_APP_LOCAL_STORAGE_NAME, true);
+  const address = getStorage(process.env.REACT_APP_SESSION_STORAGE_NAME, false);
 
   //get sessionId
   const {
     data: { id: sessionId },
-  } = await axios.post(path, { items });
+  } = await axios.post(path, { items, address });
 
   // When the customer clicks on the button, redirect them to Checkout.
   const result = await stripe.redirectToCheckout({

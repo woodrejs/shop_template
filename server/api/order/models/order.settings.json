@@ -38,9 +38,6 @@
     "email": {
       "type": "email"
     },
-    "session_id": {
-      "type": "string"
-    },
     "orderList": {
       "type": "component",
       "repeatable": true,
