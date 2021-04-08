@@ -28,6 +28,7 @@ const Store = createStore({
       phone: true,
       email: true,
     },
+    totalAmount: 0,
   },
   // actions that trigger store mutation
   actions: {
@@ -54,6 +55,11 @@ const Store = createStore({
     setAdressValidation: (value) => ({ setState, getState }) => {
       setState({
         adressValidation: value,
+      });
+    },
+    setTotalAmount: (value) => ({ setState, getState }) => {
+      setState({
+        totalAmount: value,
       });
     },
   },

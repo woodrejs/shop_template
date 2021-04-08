@@ -1,31 +1,58 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 //COMPONENTS
-import Product from "../components/Product";
+import ProductInShop from "../components/ProductInShop";
 import Basket from "../components/Basket";
 //UTILES
-import { useCounter } from "../utils/Sweet_state";
+import axios from "axios";
 
 const Shop = () => {
-  const [{ products }] = useCounter();
+  const [products, setProducts] = useState([]);
 
-  const displayProducts = () =>
-    products.map((product) => <Product key={product._id} product={product} />);
+  useEffect(() => {
+    (async function () {
+      const resp = await getProducts();
+      setProducts(resp);
+    })();
+  }, []);
 
   return (
-    <div class="mysection">
-      <div class="mycontainer">
-        <div class="menu">
-          <div class="menu__cart">
+    <div className="mysection">
+      <div className="mycontainer">
+        <div className="menu">
+          <div className="menu__cart">
             <Basket />
           </div>
         </div>
-        <div class="title_box">
-          <h1 class="title">Shop</h1>
+        <div className="title_box">
+          <h1 className="title">Shop</h1>
         </div>
-        <div class="w-layout-grid grid">{displayProducts()}</div>
+        <div
+          className="w-layout-grid grid"
+          children={displayProducts(products)}
+        />
       </div>
     </div>
   );
 };
 
 export default Shop;
+
+async function getProducts() {
+  const resp = await axios.post(`${process.env.REACT_APP_DB_HOST}/graphql`, {
+    query: `{
+              products{
+                _id
+                name
+                unit_amount
+                images{
+                  url
+                }                  
+              }
+            }`,
+  });
+
+  return resp.data.data.products;
+}
+function displayProducts(arr) {
+  return arr.map((item) => <ProductInShop key={item._id} product={item} />);
+}

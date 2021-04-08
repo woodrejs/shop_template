@@ -3,8 +3,8 @@ import React, { useState } from "react";
 import { useCounter } from "../utils/Sweet_state";
 import { addToCart, removeFromCart, removeItemFromCart } from "../utils/Cart";
 
-const ProductInCart = ({ product, quantity }) => {
-  const { name, unit_amount, _id, images } = product;
+const ProductInCart = ({ product }) => {
+  const { name, unit_amount, _id, images, quantity } = product;
   const [productQnty, setProductQnty] = useState(quantity);
   //sweet_state
   const [, { setCart }] = useCounter();
@@ -21,20 +21,20 @@ const ProductInCart = ({ product, quantity }) => {
   };
 
   return (
-    <div class="productincart">
+    <div className="productincart">
       {images.length && (
-        <img src={images[0].url} class="image-2" alt="product_thumb" />
+        <img src={images[0].url} className="image-2" alt="product_thumb" />
       )}
-      <div class="productincart--content">
-        <h4 class="productincart__title">{name}</h4>
-        <h4 class="productincart__price">{unit_amount} PLN</h4>
+      <div className="productincart--content">
+        <h4 className="productincart__title">{name}</h4>
+        <h4 className="productincart__price">{unit_amount} PLN</h4>
         <input
           type="number"
           onChange={(e) => handleNumberInput(e)}
           value={productQnty}
         />
         <button
-          class="button w-button"
+          className="button w-button"
           onClick={() => removeItemFromCart(_id, setCart)}
           children="Remove from Cart"
         />
