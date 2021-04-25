@@ -30,6 +30,10 @@
     },
     "unit_amount": {
       "type": "integer"
+    },
+    "categories": {
+      "via": "products",
+      "collection": "category"
     }
   }
 }

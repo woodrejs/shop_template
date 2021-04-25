@@ -10,10 +10,8 @@ const Cart = () => {
   const [{ cart }, { setCart }] = useCounter();
   const [totalPrice, setTotalPrice] = useState(0);
 
-  //handlers
   const handleClearCart = () => setCart([]);
 
-  //effects
   useEffect(() => setTotalPrice(getTotalPrice(cart)), [cart]);
 
   return (
@@ -39,8 +37,7 @@ const Cart = () => {
             <ProductsInCart />
             <div className="cart__panel">
               <h3 className="cart__panel__total_price">
-                total price: <span>{totalPrice}</span>
-                pLN
+                <span>total price: {totalPrice} PLN</span>
               </h3>
               <button
                 onClick={handleClearCart}

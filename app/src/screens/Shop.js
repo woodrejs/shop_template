@@ -1,19 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 //COMPONENTS
 import ProductInShop from "../components/ProductInShop";
 import Basket from "../components/Basket";
+//import CategoriesForm from "../components/CategoriesForm";
 //UTILES
-import axios from "axios";
+import { useQuery } from "@apollo/client";
+import { getProductsQuery } from "../utils/Queries";
 
 const Shop = () => {
-  const [products, setProducts] = useState([]);
+  const [limit, setLimit] = useState(6);
+  const { loading, data } = useQuery(getProductsQuery, {
+    variables: { limit },
+  });
 
-  useEffect(() => {
-    (async function () {
-      const resp = await getProducts();
-      setProducts(resp);
-    })();
-  }, []);
+  const handleMoreProducts = () => setLimit(limit + 6);
+  const handleDisplayProducts = () =>
+    loading
+      ? "Loading ..."
+      : data.products.map((item) => (
+          <ProductInShop key={item._id} product={item} />
+        ));
 
   return (
     <div className="mysection">
@@ -26,33 +32,17 @@ const Shop = () => {
         <div className="title_box">
           <h1 className="title">Shop</h1>
         </div>
+        {/*<CategoriesForm />*/}
         <div
           className="w-layout-grid grid"
-          children={displayProducts(products)}
+          children={handleDisplayProducts()}
         />
+      </div>
+      <div>
+        <button onClick={handleMoreProducts}>more products</button>
       </div>
     </div>
   );
 };
 
 export default Shop;
-
-async function getProducts() {
-  const resp = await axios.post(`${process.env.REACT_APP_DB_HOST}/graphql`, {
-    query: `{
-              products{
-                _id
-                name
-                unit_amount
-                images{
-                  url
-                }                  
-              }
-            }`,
-  });
-
-  return resp.data.data.products;
-}
-function displayProducts(arr) {
-  return arr.map((item) => <ProductInShop key={item._id} product={item} />);
-}
