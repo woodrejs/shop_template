@@ -2,7 +2,7 @@ import React, { useState } from "react";
 //COMPONENTS
 import ProductInShop from "../components/ProductInShop";
 import Basket from "../components/Basket";
-//import CategoriesForm from "../components/CategoriesForm";
+import CategoriesForm from "../components/CategoriesForm";
 //UTILES
 import { useQuery } from "@apollo/client";
 import { getProductsQuery } from "../utils/Queries";
@@ -14,12 +14,13 @@ const Shop = () => {
   });
 
   const handleMoreProducts = () => setLimit(limit + 6);
-  const handleDisplayProducts = () =>
-    loading
+  const handleDisplayProducts = () => {
+    return loading
       ? "Loading ..."
       : data.products.map((item) => (
           <ProductInShop key={item._id} product={item} />
         ));
+  };
 
   return (
     <div className="mysection">
@@ -32,7 +33,7 @@ const Shop = () => {
         <div className="title_box">
           <h1 className="title">Shop</h1>
         </div>
-        {/*<CategoriesForm />*/}
+        <CategoriesForm />
         <div
           className="w-layout-grid grid"
           children={handleDisplayProducts()}

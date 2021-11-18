@@ -4,7 +4,7 @@ import AdressForm from "../components/AdressForm";
 import ProductsInCart from "../components/ProductsInCart";
 //utiles
 import { useCounter } from "../utils/Sweet_state";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 const Cart = () => {
   const [{ cart }, { setCart }] = useCounter();
@@ -19,9 +19,9 @@ const Cart = () => {
       <div className="mycontainer">
         <div className="menu manu--cart">
           <div className="menu__cart">
-            <Link to="/shop" className="heading-2">
+            <NavLink to="/shop" className="heading-2">
               go back
-            </Link>
+            </NavLink>
           </div>
         </div>
         <div className="title_box">

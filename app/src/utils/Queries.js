@@ -1,12 +1,12 @@
 import { gql } from "@apollo/client";
 
 export const getProductsQuery = gql`
-  query Products($limit: Int!) {
+  query($limit: Int!) {
     products(limit: $limit) {
       _id
       name
       unit_amount
-      category {
+      categories {
         name
       }
       images {
@@ -39,3 +39,23 @@ export const getProductInCartQuery = gql`
     }
   }
 `;
+export const getCategoriesQuery = gql`
+  query {
+    categories {
+      name
+      _id
+    }
+  }
+`;
+/*
+export const getCategoryQuery = gql`
+  query($id: ID!) {
+    category(id: $id) {
+      name
+      products {
+        name
+      }
+    }
+  }
+`;
+*/

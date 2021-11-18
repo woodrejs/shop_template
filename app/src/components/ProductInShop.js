@@ -2,7 +2,7 @@ import React from "react";
 //UTILES
 import { useCounter } from "../utils/Sweet_state";
 import { addToCart } from "../utils/Cart";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 const ProductInShop = ({ product }) => {
   const { _id, name, unit_amount, images } = product;
@@ -16,7 +16,7 @@ const ProductInShop = ({ product }) => {
       id="w-node-_7b61a85c-08ba-878d-f4aa-b0b1e6dd3eea-a53abb1b"
       className="product"
     >
-      <Link to={`/product/?_id=${_id}`}>
+      <NavLink to={`/product/?_id=${_id}`}>
         {images.length && (
           <img
             src={images[0].url}
@@ -25,7 +25,7 @@ const ProductInShop = ({ product }) => {
             className="image"
           />
         )}
-      </Link>
+      </NavLink>
       <div className="product__content">
         <h4 className="product__title">{name}</h4>
         <h4 className="product__price">{unit_amount}</h4>

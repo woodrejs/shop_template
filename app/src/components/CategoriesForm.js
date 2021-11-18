@@ -1,87 +1,44 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+//COMPONENTS
+import CustomInput from "./CustomInput";
 //UTILES
-import axios from "axios";
+import { useQuery } from "@apollo/client";
+import { getCategoriesQuery } from "../utils/Queries";
+import { useCounter } from "../utils/Sweet_state";
 
 const CategoriesForm = () => {
-  const [categories, setCategories] = useState([]);
-  const [checkedList, setCheckedList] = useState([]);
+  const [formData, setFormData] = useState(null);
+  const [, { setCategories }] = useCounter();
+  const { loading, data } = useQuery(getCategoriesQuery);
 
-  useEffect(() => {
-    (async function () {
-      const resp = await axios.post(
-        `${process.env.REACT_APP_DB_HOST}/graphql`,
-        {
-          query: `{
-                  categories{                 
-                              name 
-                              _id               
-                            }
-                  }`,
-        }
-      );
-      const data = resp.data.data.categories;
-      setCategories(data);
-      const list = {};
-      data.forEach((item) => (list[item.name] = false));
-      setCheckedList(list);
-    })();
-  }, []);
-
-  const handleChange = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const list = { ...checkedList };
-    list[e.target.name] = e.target.checked;
-    setCheckedList(list);
+    setCategories(formData);
+  };
+  const handleChange = (e) => {
+    const name = e.currentTarget.name;
+    const isChecked = e.currentTarget.checked;
+    const newFormData = { ...formData };
+    newFormData[name] = isChecked;
+
+    setFormData(newFormData);
   };
 
-  console.log(checkedList);
-
-  return (
-    <form>
-      <span>Category</span>
-      {categories.map((item) => (
-        <CategoryInput
-          key={item._id}
-          item={item}
+  return loading ? (
+    <div>Loading ...</div>
+  ) : (
+    <form onSubmit={handleSubmit}>
+      {data.categories.map((category) => (
+        <CustomInput
           handler={handleChange}
-          checked={checkedList[item.name]}
+          name={category.name}
+          key={category._id}
+          id={category._id}
         />
       ))}
+
+      <input type="submit" value="submit" />
     </form>
   );
 };
 export default CategoriesForm;
-
-function CategoryInput({ item, handler, checked }) {
-  const { name, _id } = item;
-  return (
-    <div>
-      <label htmlFor={_id}>{name}</label>
-      <input
-        type="checkbox"
-        name={name}
-        id={_id}
-        onChange={(e) => handler(e)}
-        checked={checked || false}
-      />
-    </div>
-  );
-}
-
-/*
-    <form>
-      <span>Category</span>
-      {categories.map(({ name, _id }) => (
-        <div key={_id}>
-          <label htmlFor={_id}>{name}</label>
-          <input
-            type="checkbox"
-            name={name}
-            id={_id}
-            onChange={(e) => handleChange(e)}
-            checked={checkedList[name] || false}
-          />
-        </div>
-      ))}
-    </form>
-    */
